@@ -1,6 +1,5 @@
 #include <bits/stdc++.h>
 #define rep(i, s, t) for(int i=s;i<=t;i++)
-#define ite(it,s,e) for(auto it=s,it!=e,++it)
 using namespace std;
 
 /* 全局变量 */
@@ -37,7 +36,7 @@ bool isGameEnd() {
     if (ps[0].hp <= 0) return true;
     rep(i, 1, n-1)
         if (ps[i].type == 'F' && ps[i].hp > 0)
-            return false;//还有反猪活着
+            return false;
     return true;
 }
 int cnt = 0;
@@ -53,6 +52,7 @@ void judgeGameEnd() {
                 printf("\n");
             }
         }
+
         exit(0);
     }
 }
@@ -121,69 +121,6 @@ bool Pig::useP() {
     return false;
 }
 
-bool Pig::useK() {
-    // TODO: 补全代码
-    if(this->type=='M'){
-        if(this->getNextPig()->jumpType=='F'||this->getNextPig()->jumpType=='f'){
-            if(this->del('K')){
-                return true;
-            }
-        }
-    }else if(this->type=='Z'){
-        if(this->getNextPig()->jumpType=='F'){
-            if(this->del('K')){
-                return true;
-            }
-        }
-    }else if(this->type=='F'){
-        if(this->getNextPig()->jumpType=='M'||this->getNextPig()->jumpType=='Z'){
-            if(this->del('K')){
-                return true;
-            }
-        }
-    }
-    /*
-    if(this->del('K')){
-        return true;
-    }*/
-    return false;
-}
-
-bool Pig::useF() {
-    // TODO: 补全代码
-    if(this->del('F')){
-        return true;
-    }
-    return false;
-}
-
-bool Pig::useN() {
-    for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
-        // TODO: 补全代码
-        nxt->cost(this,'K');
-    }
-    return true;
-}
-
-bool Pig::useW() {
-    for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
-        // TODO: 补全代码
-        nxt->cost(this,'D');
-    }
-    return true;
-}
-
-bool Pig::del(char c) {
-    // TODO: 补全代码
-    for(auto it=this->cards.begin();it!=this->cards.end();++it){
-        if(*it==c){
-            this->cards.erase(it);
-            return true;
-        }
-    }
-    return false;
-}
-
 void Pig::hurt(Pig *attacker) {
     if (--hp == 0) {
         if (this->del('P')) {
@@ -206,7 +143,7 @@ bool Pig::cost(Pig* attacker, char c) {
     return false;
 }
 
-bool Pig::findJ(Pig *attacker) {
+bool Pig::findJ(Pig *attacker) {//
     Pig* nxt = attacker;
     do {
         // "找个好心的猪猪帮我挡刀"
@@ -225,6 +162,125 @@ bool Pig::useJ(Pig *pig) {
         if (!this->isJumpItsFriend(nxt) && nxt->del('J')) {
             nxt->jump();
             return !pig->findJ(nxt);
+        }
+    }
+    return false;
+}
+
+bool Pig::useK() {
+    // TODO: 补全代码
+    bool flag=false;
+    if(this->type=='M'){
+//对于每种表敌意的方式，对逆时针方向能够执行到的第一只已跳反猪表；如果没有，对逆时针方向能够执行到的第一只类反猪表，再没有，那么就不表敌意；
+        if(this->getNextPig()->jumpType=='F'||this->getNextPig()->jumpType=='f'){
+            flag=true;
+        }
+    }else if(this->type=='Z'){
+//对于每种表敌意的方式，对「逆时针方向能够执行到的第一只已经跳反的猪」表，如果没有，那么就不表敌意；
+        if(this->getNextPig()->jumpType=='F'){
+            flag=true;
+        }
+    }else if(this->type=='F'){
+//对于每种表敌意的方式，如果有机会则对主猪表，否则，对「逆时针方向能够执行到的第一只已经跳忠的猪」表，如果没有，那么就不表敌意；
+        if(this->getNextPig()->jumpType=='M'||this->getNextPig()->jumpType=='Z'){
+            flag=true;
+        }
+    }
+    if(flag){//表敌意则确认出牌
+        this->jump();//跳身份
+        this->getNextPig()->cost(this,'D');//被表敌意者被迫弃置闪
+        return true;
+    }
+    return false;
+}
+bool Pig::useF(){
+    // TODO: 补全代码
+    if(this->type=='M'){
+//对于每种表敌意的方式，对逆时针方向能够执行到的第一只已跳反猪表；如果没有，对逆时针方向能够执行到的第一只类反猪表，再没有，那么就不表敌意；
+//决斗时，如果对方是主猪，那么不会弃置杀，否则，会不遗余力弃置杀；
+        for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
+            if(nxt->jumpType=='F'){//主猪对反猪决斗
+                if(nxt->findJ(this)){return true;}//寻求无懈可击
+                while(nxt->cost(this,'K')){//决斗出杀阶段
+                    if(!this->cost(nxt,'K')){
+                        break;
+                    }
+                }
+                return true;
+            }
+        }
+        for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
+            if(nxt->jumpType=='f'){//没有已跳反猪，则主猪对类反猪决斗
+                if(nxt->findJ(this)){return true;}//寻求无懈可击
+                if(nxt->type=='Z'){//类反猪是忠猪
+                    nxt->hurt(this);
+                    return true;
+                }
+                while(nxt->cost(this,'K')){//决斗出杀阶段
+                    if(!this->cost(nxt,'K')){
+                        break;
+                    }
+                }
+                return true;
+            }
+        }
+    }else if(this->type=='Z'){
+//对于每种表敌意的方式，对「逆时针方向能够执行到的第一只已经跳反的猪」表，如果没有，那么就不表敌意；
+        for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
+            if(nxt->jumpType=='F'){
+                this->jump();//跳身份
+                if(nxt->findJ(this)){return true;}//寻求无懈可击
+                while(nxt->cost(this,'K')){//决斗出杀阶段
+                    if(!this->cost(nxt,'K')){
+                        break;
+                    }
+                }
+                return true;
+            }
+        }
+    }else if(this->type=='F'){
+//对于每种表敌意的方式，如果有机会则对主猪表，否则，对「逆时针方向能够执行到的第一只已经跳忠的猪」表，如果没有，那么就不表敌意；
+        this->jump();//跳身份
+        if(ps[0].findJ(this)){return true;}//寻求无懈可击
+        while(ps[0].cost(this,'K')){//决斗出杀阶段
+            if(!this->cost(&ps[0],'K')){
+                break;
+            }
+        }
+        return true;
+    }
+    return false;
+}
+bool Pig::useN() {
+    for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
+        // TODO: 补全代码
+        if(nxt->findJ(this)){continue;}//寻求无懈可击
+        if(!nxt->cost(this,'K')){//扣血
+            if(nxt->type=='M'&&this->jumpType==0){//对象是主猪,且使用者未跳身份
+                this->jumpType='f';
+            }
+        }
+    }
+    return true;
+}
+bool Pig::useW() {
+    for (Pig* nxt = getNextPig(); nxt != this; nxt = nxt->getNextPig()) {
+        // TODO: 补全代码
+        if(nxt->findJ(this)){continue;}//寻求无懈可击
+        if(!nxt->cost(this,'D')){//扣血
+            if(nxt->type=='M'&&this->jumpType==0){//对象是主猪,且使用者未跳身份
+                this->jumpType='f';
+            }
+        }
+    }
+    return true;
+}
+bool Pig::del(char c) {
+    // TODO: 补全代码
+    for(auto it=this->cards.begin();it!=this->cards.end();++it){
+        if(*it==c){//比较牌是否为c，是则删除并返回true
+            this->cards.erase(it);
+            return true;
         }
     }
     return false;
