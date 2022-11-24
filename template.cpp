@@ -17,6 +17,5 @@ const int maxn = 1e6 + 6;
 int main() {
   ios::sync_with_stdio(false);
   // file(data);
-  cout << "Hello world!";
   return 0;
 }
