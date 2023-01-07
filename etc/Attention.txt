@@ -1,0 +1,2 @@
+一定仔细末尾的'提示'，少走弯路！
+memset(void *_Dst,int _Val,size_t _Size) _Val取后八位，八位一赋值

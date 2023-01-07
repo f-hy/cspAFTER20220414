@@ -1,41 +1,35 @@
-#include <bits/stdc++.h>
+#include <cmath>
+#include <iostream>
 using namespace std;
-#define mem(f, v) memset(f, v, sizeof(f))
-#define file(x)                  \
-  freopen(#x ".in", "r", stdin); \
-  freopen(#x ".out", "w", stdout);
-#define pii pair<int, int>
-typedef long long ll;
-const int maxn = 1e6 + 6;
-const int inf = ~(1u << 31u);
-const ll linf = ~(1llu << 63u);
-struct struc {
-  int a = 3;
-  int b;
-} st;
+#define ll long long
+const int M = 1e5 + 5;
+int n, N;
+int A[M];
+int R;
+ll error;
+ll get(int l, int r) {  //求g[l] + g[l+1] + ... + g[r]
+  if (l / R == r / R) return (ll)(l / R) * (r - l + 1);
+  int a = l / R + 1, b = r / R - 1;
+  ll res = (a - 1) * (ll)(a * R - l);          // left
+  res += (b + 1) * (ll)(r - (b * R + R) + 1);  // right
+  res += (ll)(b - a + 1) * (a + b) / 2 * R;    // mid,等差数列求和
+  return res;
+}
 int main() {
-  // ios::sync_with_stdio(false);
-  // // file(data);
-  // int size = 1e1 + 3;
-  // cout << "start:\n";
-  // time_t t1 = clock();
-  // for (int i = 0; i < 100000009; ++i) {
-  //   bool x = (997 / 3 != 333);
-  // }
-  // time_t t2 = clock();
-  // for (int i = 0; i < 100000009; ++i) {
-  //   bool x = (997 != 333 * 3);
-  // }
-  // time_t t3 = clock();
-  // cout << t2 - t1 << '\n' << t3 - t2 << endl;
-  vector<pii> v(10);
-  for (int i = 0; i < 10; ++i) {
-    v[i].first = -i;
-    v[i].second = -i;
+  cin >> n >> N;
+  for (int i = 1; i <= n; i++) cin >> A[i];
+  A[n + 1] = N;
+  R = N / (n + 1);
+  for (int i = 0; i <= n; i++) {
+    int l = A[i], r = A[i + 1] - 1;
+    if (i >= r / R || i <= l / R) {
+      error += abs((ll)(r - l + 1) * i - get(l, r));
+    } else {
+      int mid = i * R;
+      error += abs((ll)(mid - l + 1) * i - get(l, mid));  // left
+      error += abs((ll)(r - mid + 1) * i - get(mid, r));  // right
+    }
   }
-  sort(v.begin(), v.end(), [](pii &a, pii &b) { return a.first > b.first; });
-  for (auto &i : v) {
-    cout << i.first << ' ' << i.second << endl;
-  }
+  cout << error;
   return 0;
 }
