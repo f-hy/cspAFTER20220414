@@ -28,9 +28,9 @@ int main(){
             }
             if(i<=2||i+1>=n){//收尾判断，落果记录
                 if(i==1) ee[0]=true;
-                else if(i==2) ee[1]=true;
-                else if(i==n-1) ee[2]=true;
-                else ee[3]=true;
+                if(i==2) ee[1]=true;
+                if(i==n-1) ee[2]=true;
+                if(n==n) ee[3]=true;
             }
         }else{//未发生落果，连续值清零
             tmp=0;

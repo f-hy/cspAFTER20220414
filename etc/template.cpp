@@ -8,7 +8,7 @@ using namespace std;
 #define pii pair<int, int>
 #define pll pair<ll, ll>
 #define rep(i, s, t) for (int i = s; i <= t; i++)
-#define ite(it, s, e) for (auto it = s, it != e, ++it)
+#define ite(it, s, e) for (auto it = s; it != e; ++it)
 
 const int inf = ~(1u << 31u);
 const ll linf = ~(1llu << 63u);
