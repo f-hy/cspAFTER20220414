@@ -13,5 +13,7 @@ bool cmp(int a, int b) { return a < b; }
 int main() {
   ios::sync_with_stdio(false);
   // file(data);
+  float m=1234567.5;
+  cout<<fixed<<setprecision(1)<<m;
   return 0;
 }

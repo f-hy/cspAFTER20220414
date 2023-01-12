@@ -1,5 +1,5 @@
 /**
- * @file 2018031.cpp
+ * @file 2018121.cpp
  * @author Friendy (friend0@qq.com)
  * @date 2023-01-11
  * @version 0.1
@@ -15,21 +15,20 @@ using namespace std;
 #define rep(i,s,t) for(int i=s;i<=t;i++)
 #define dwn(i,s,t) for(int i=s;i>=t;i--)
 #define ite(it,s,e) for(auto it=s;it!=e;++it)
-int score,ans,cnt;
+int r,y,g,n,k,t,ans;
 int main(){
     ios::sync_with_stdio(false);
     // file(data);
-    //scanf("%d", score)!=EOF
-    cin>>score;
-    while(score){
-        if(score==1)
-            cnt=1;
-        else if(cnt>1)
-            cnt+=2;
-        else
-            cnt=2;
-        ans+=cnt;
-        cin>>score;
+    cin>>r>>y>>g>>n;//rgy
+    rep(i,1,n){
+        cin>>k>>t;
+        switch(k){
+            case 0:
+            case 1:ans+=t;break;//r
+            case 2:ans+=(t+r);break;//y
+            case 3:break;//g
+            default:break;
+        }
     }
     cout<<ans;
     return 0;
